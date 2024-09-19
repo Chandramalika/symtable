@@ -33,7 +33,7 @@ SymTable_t SymTable_new (void){
 void SymTable_free (SymTable_t oSymTable){
     assert(oSymTable != nullptr); // assert macro to ensure it is not a void pointer
     Binding* curr = oSymTable->head; // curr = head
-    while (curr != nullptr){ // deleting all the nodes in a loop until it is empty
+    while (curr){ // deleting all the nodes in a loop until it is empty
         Binding* next = curr->next;
         delete curr;
         curr = next;
@@ -63,7 +63,7 @@ int SymTable_contains (SymTable_t oSymTable, const char *pcKey){
 
     Binding *curr = oSymTable->head;
     while (curr){
-        if (strcmp(pcKey,curr->key)==0) return 1;// key already exists
+        if (curr->key == pcKey) return 1;// key already exists
         curr = curr->next;
     }
     return 0;
@@ -98,4 +98,46 @@ void *SymTable_get (SymTable_t oSymTable, const char *pcKey){
         curr = curr->next;
     }
     return nullptr;
+}
+
+void *SymTable_replace (SymTable_t oSymTable, const char *pcKey, const void *pvValue){
+    assert(oSymTable != nullptr);
+    assert(pcKey != nullptr);
+    assert(pvValue != nullptr);
+    Binding *curr = oSymTable->head;
+    while (curr){
+        if (curr->key == pcKey){//if equal
+            void *oldValue = curr->value; // pointer to the original value
+            curr->value = const_cast<void *>(pvValue);// new value for the binding
+            return oldValue;// returns pointer to the old value
+        }
+        curr = curr->next;
+    }
+    return nullptr;
+
+}
+
+
+void *SymTable_remove (SymTable_t oSymTable, const char *pcKey){
+    assert(oSymTable != nullptr);
+    assert(pcKey != nullptr);
+    Binding* curr = oSymTable->head; // curr = head
+    Binding* prev = nullptr;
+    while (curr){ 
+        if (curr->key == pcKey) {
+            if (prev == nullptr) {
+                oSymTable->head = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
+            void* oldValue = curr->value;
+            delete curr;
+            oSymTable->length--;
+            return oldValue; // Return the old value
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+    return nullptr;
+
 }

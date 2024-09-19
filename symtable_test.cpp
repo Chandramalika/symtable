@@ -83,8 +83,6 @@ void test_symtable_contains(SymTable_t symTable, const char *pcKey){
 }
 
 void test_symtable_get (SymTable_t symTable,const char *pcKey, const void *pvValue){
-    assert(symTable != nullptr);
-    
     void *val = SymTable_get(symTable, pcKey);
     if (val == pvValue){
         cout << "Test for symtable_get passed: returns the correct binding value "<<endl;
@@ -95,6 +93,30 @@ void test_symtable_get (SymTable_t symTable,const char *pcKey, const void *pvVal
     
 }   
 
+void test_symtable_replace(SymTable_t symTable, const char *pcKey, const void *pvValue){
+    void * getValue = SymTable_get(symTable,pcKey);
+    void * oldValue = SymTable_replace(symTable,pcKey,pvValue);
+    if (oldValue == getValue){
+        cout << "Test for Symtable_replace passed: returns pointer to the old value"<<endl;
+    }
+    else{
+        cout << "Test for Symtable_replace failed"<<endl;
+    }
+}
+
+void test_symtable_remove (SymTable_t symTable, const char *pcKey){
+    void * getValue = SymTable_get(symTable,pcKey);
+    void * oldValue = SymTable_remove(symTable,pcKey);
+    if (oldValue == getValue){
+        cout << "Test for Symtable_remove passed: returns pointer to the old value"<<endl;
+        if (SymTable_contains(symTable,pcKey) == 0){
+            cout << "Binding with the key has been deleted"<<endl;
+        }
+    }
+    else{
+        cout << "Test for Symtable_remove failed"<<endl;
+    }
+}
 
 
 // int main(int argc, char **argv) {
@@ -117,8 +139,8 @@ int main(){
     test_symtable_put(symTable,key1,(const void*)&value1);
     test_symtable_contains(symTable,key);
     test_symtable_get(symTable,key1,(const void*)&value1);
-
-
+    test_symtable_replace(symTable,key,(const void*)&value1);
+    test_symtable_remove(symTable,key);
     test_symtable_map(symTable);
     test_symtable_free(symTable);
     return 0;
