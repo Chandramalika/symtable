@@ -56,3 +56,46 @@ void SymTable_map (SymTable_t oSymTable, void (*pfApply) (const char *pcKey, con
         curr = curr->next;
     }
 }
+
+int SymTable_contains (SymTable_t oSymTable, const char *pcKey){
+    assert(oSymTable != nullptr);
+    assert(pcKey != nullptr);
+
+    Binding *curr = oSymTable->head;
+    while (curr){
+        if (strcmp(pcKey,curr->key)==0) return 1;// key already exists
+        curr = curr->next;
+    }
+    return 0;
+}
+
+int SymTable_put (SymTable_t oSymTable,const char *pcKey, const void *pvValue){
+    assert(oSymTable != nullptr);
+    assert(pcKey != nullptr);
+    assert(pvValue != nullptr);
+    if (SymTable_contains(oSymTable, pcKey)==0){
+        Binding *newBinding = new Binding;
+        if (!newBinding) return 0;//failed mem allocation
+        newBinding->key = (char*)pcKey;
+        newBinding->value = (void*)pvValue;
+        newBinding->next = oSymTable->head;
+        oSymTable->head = newBinding;//newbinding is the new head
+        oSymTable->length += 1;
+        return 1;
+    }
+    return 0;//key not found
+}   
+
+
+void *SymTable_get (SymTable_t oSymTable, const char *pcKey){
+    assert(oSymTable != nullptr);
+    assert(pcKey != nullptr);
+    Binding *curr = oSymTable->head;
+    while (curr){
+        if (strcmp(pcKey,curr->key)==0) {
+            return curr->value;
+        }
+        curr = curr->next;
+    }
+    return nullptr;
+}

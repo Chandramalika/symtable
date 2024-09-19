@@ -39,7 +39,8 @@ void test_symtable_getlength(SymTable_t symTable){
 
 
 void printBinding(const char *key, const void *value, void *extra) {
-    cout<<"Key: "<<key<< ",Value: "<< value << endl;
+    const int *intValue = static_cast<const int *>(value);
+    cout<<"Key: "<<key<< ",Value: "<< *intValue << endl;
 }
 
 void test_symtable_map(SymTable_t symTable){
@@ -52,6 +53,50 @@ void test_symtable_map(SymTable_t symTable){
     }
 }
 
+void test_symtable_put (SymTable_t symTable,const char *pcKey, const void *pvValue){
+    assert(symTable != nullptr);
+    int len1 = SymTable_getLength(symTable);
+    int putValue = SymTable_put(symTable,pcKey,pvValue);
+    int len2 = SymTable_getLength(symTable);
+    if (putValue ==1 && len2-len1 ==1){
+        cout << "Test passed: new binding created for this key and value"<<endl;
+    }
+    else if(putValue ==0 && len2==len1){
+        cout << "Test passed: failed to add new binding and returns 0"<<endl;
+    }
+    else{
+        cout << "Test failed for SymTable_put fnction"<<endl;
+    }
+    
+}   
+
+void test_symtable_contains(SymTable_t symTable, const char *pcKey){
+    assert(symTable != nullptr);
+    assert(pcKey != nullptr);
+    // test has been used after using put for the key and value so it should return 1
+    if (SymTable_contains(symTable,pcKey)){
+        cout << "Test for symTable_contains passed: returns 1 for valid key in symtable "<<endl;
+    }
+    else{
+        cout << "Test failed for symTable_contains"<<endl;
+    }
+}
+
+void test_symtable_get (SymTable_t symTable,const char *pcKey, const void *pvValue){
+    assert(symTable != nullptr);
+    
+    void *val = SymTable_get(symTable, pcKey);
+    if (val == pvValue){
+        cout << "Test for symtable_get passed: returns the correct binding value "<<endl;
+    }
+    else{
+        cout <<"Test for symtable_get Failed"<<endl;
+    }
+    
+}   
+
+
+
 // int main(int argc, char **argv) {
 //     ::testing::InitGoogleTest(&argc, argv);
 //     return RUN_ALL_TESTS();
@@ -63,7 +108,18 @@ int main(){
     SymTable_t symTable = SymTable_new();
     test_symtable_getlength(symTable);
     test_symtable_map(symTable);
-    
+    const char *key = "var";
+    int value = 20;
+    test_symtable_put(symTable,key,(const void*)&value);
+    test_symtable_put(symTable,key,(const void*)&value);
+    const char *key1 = "var1";
+    int value1 = 74;
+    test_symtable_put(symTable,key1,(const void*)&value1);
+    test_symtable_contains(symTable,key);
+    test_symtable_get(symTable,key1,(const void*)&value1);
+
+
+    test_symtable_map(symTable);
     test_symtable_free(symTable);
     return 0;
 }
